@@ -28,34 +28,46 @@ namespace minirisk
         static const std::array<unsigned, n_years> days_epoch; // num of days since 1-jan-1900 to 1-jan-yyyy (until 2200)
 
     public:
-        // Default constructor
-        // Initializes the date to 1-Jan-1970 by default.
-        // Date() : m_y(1970), m_m(1), m_d(1), m_is_leap(false) {}
-
         /*
-        Default constructor, initialize the number of days since 1-Jan-1900 to 0.
+        Modified default constructor, initialize the serial number to 0, which
+        is the number of days elapsed from 1-Jan-1900 to 1-Jan-1900.
         */
         Date() : m_serial(0) {}
 
-        // Constructor where the input value is checked.
+        // A different constructor where you can input the year, month, and day
         Date(unsigned year, unsigned month, unsigned day)
         {
             init(year, month, day);
         }
 
+        // Overloading of the init function
+
+        // Initialize with the input year, month, and day
+        // We can no longer call the internal representation of the m_y, m_m, and m_d, m_is_leap
         void init(unsigned year, unsigned month, unsigned day)
         {
             check_valid(year, month, day);
-            // m_y = (unsigned short)year;
-            // m_m = (unsigned char)month;
-            // m_d = (unsigned char)day;
-            // m_is_leap = is_leap_year(year);
-
             m_serial = days_epoch[year - 1900] + day_of_year(year, month, day);
         }
 
-        static void check_valid(unsigned y, unsigned m, unsigned d);
+        // Initialize with the input serial number
+        void init(unsigned s)
+        {
+            // A different check_valid function is called
+            check_valid(s);
+            m_serial = s;
+        }
 
+        // Overloading of the check_valid function to handle different sets of inputs
+        static void check_valid(unsigned y, unsigned m, unsigned d);
+        static void check_valid(unsigned serial);
+
+        /*
+        In C++, the comparison operators (<, ==, >, etc.) are not automatically defined
+         for user-defined types (such as classes and structs). While these operators are
+         built-in for fundamental types (like int, float, char, etc.), you need to explicitly
+        define them for your custom types to specify how objects of those types should be compared.
+        */
         bool operator<(const Date &d) const
         {
             return m_serial < d.m_serial;
@@ -67,15 +79,16 @@ namespace minirisk
         }
 
         bool operator>(const Date &d) const
-        {
+        { /*
+          This operator leverages on the operator< function
+          */
             return d < (*this);
         }
 
-        // number of days since 1-Jan-1900
-        // unsigned serial() const
-        // {
-        //     return days_epoch[m_y - 1900] + day_of_year();
-        // }
+        /*
+        modified serial function to take in the year, month, and day
+        since the internal representation of the year, month, and day is removed
+        */
         unsigned serial(unsigned y, unsigned m, unsigned d) const
         {
             return days_epoch[y - 1900] + day_of_year(y, m, d);
@@ -83,10 +96,14 @@ namespace minirisk
 
         static bool is_leap_year(unsigned yr);
 
+        // Function to convert serial to year, month, and day
+        void from_serial(unsigned serial, unsigned &year, unsigned &month, unsigned &day) const;
+
         // In YYYYMMDD format
         std::string to_string(bool pretty) const
         {
             unsigned year, month, day;
+            // from serial modifies the year, month, and day by reference (in place)
             from_serial(m_serial, year, month, day);
             return pretty
                        ? std::to_string(day) + "-" + std::to_string(month) + "-" + std::to_string(year)
@@ -94,10 +111,8 @@ namespace minirisk
         }
 
     private:
+        // Removed the internal representation of the year, month, day, and is_leap to simplify the code
         unsigned m_serial;
-
-        // Convert serial to year, month, and day
-        void from_serial(unsigned serial, unsigned &year, unsigned &month, unsigned &day) const;
     };
 
     long operator-(const Date &d1, const Date &d2);

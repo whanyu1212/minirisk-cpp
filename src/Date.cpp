@@ -39,6 +39,12 @@ namespace minirisk
         return os.str();
     }
 
+    /*
+    The implementation of check_valid for Date that takes in the year, month, and day.
+    The function checks if the year is within the range of first_year and last_year.
+    The function checks if the month is between 1 and 12.
+    The function checks if the day is between 1 and the maximum number of days in the month.
+    */
     void Date::check_valid(unsigned y, unsigned m, unsigned d)
     {
         MYASSERT(y >= first_year, "The year must be no earlier than year " << first_year << ", got " << y);
@@ -48,16 +54,37 @@ namespace minirisk
         MYASSERT(d >= 1 && d <= dmax, "The day must be a integer between 1 and " << dmax << ", got " << d);
     }
 
-    // unsigned Date::day_of_year() const
-    // {
-    //     return days_ytd[m_m - 1] + ((m_m > 2 && m_is_leap) ? 1 : 0) + (m_d - 1);
-    // }
+    /*
+    The implementation of check_valid for Date that takes in the serial number.
+    The function checks if the serial number is a non-negative integer.
+    The function checks if the serial number is smaller than the maximum number of days in the last year
+    which is 109572.
+    */
+    void Date::check_valid(unsigned serial)
+    {
+        MYASSERT(serial >= 0, "The serial number must be a non-negative integer, got " << serial);
+        MYASSERT(serial < days_epoch[n_years - 1] + 365 + (is_leap_year(last_year) ? 1 : 0), "The serial number must be smaller than " << days_epoch[n_years - 1] + 365 + (is_leap_year(last_year) ? 1 : 0) << ", got " << serial);
+    }
 
+    /*
+    Modified the day_of_year function to take in the year, month, and day since
+    the internal representation of the year, month, and day is removed.
+    */
+    unsigned Date::day_of_year(unsigned y, unsigned m, unsigned d) const
+    {
+        return days_ytd[m - 1] + ((m > 2 && is_leap_year(y)) ? 1 : 0) + (d - 1);
+    }
+
+    /*
+    A function to convert the serial number to year, month, and day
+    respectively. The function takes in the serial number and returns
+    the year, month, and day by reference.
+    */
     void Date::from_serial(unsigned serial, unsigned &year, unsigned &month, unsigned &day) const
     {
         const unsigned days_per_year = 365;
         const unsigned days_per_leap_year = 366;
-        const unsigned epoch_year = 1970;
+        const unsigned epoch_year = Date::first_year;
 
         year = epoch_year;
         while (serial >= (is_leap_year(year) ? days_per_leap_year : days_per_year))
@@ -75,11 +102,6 @@ namespace minirisk
         }
 
         day = serial + 1;
-    }
-
-    unsigned Date::day_of_year(unsigned y, unsigned m, unsigned d) const
-    {
-        return days_ytd[m - 1] + ((m > 2 && is_leap_year(y)) ? 1 : 0) + (d - 1);
     }
 
     /*  The function calculates the distance between two Dates.
