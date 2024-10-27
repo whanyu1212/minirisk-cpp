@@ -1,3 +1,6 @@
+# FE5226 Project
+
+## Project Description
 This source code constitutes the foundation of a risk management system and is 
 provided to the Students of the course "C++ in Financial Engineering" at 
 National University of Singapore (FE5226) as a base-line to practice the 
@@ -18,3 +21,32 @@ payment systems; support for parallel computations (thread safety).
 All these features can be implemented as modifications or extensions of the code 
 provided. The document in the doc directory specifies a list of tasks for 
 improving and extending the system, which Students are supposed to carry out.
+
+
+## Changelog
+
+<details>
+<summary>6.1 Improve the Date Class</summary>
+
+Date.h:
+- Modified internal data members to only contain `m_serial` which initializes to 0
+- Added function overloading for `init` and `check_valid` to accommodate for different ways of constructing the Date object
+- Added input parameter arg for `day_of_year` and `serial` since m_y, m_m and m_d are removed from the struct
+- Added function definition for `from_serial`
+
+Date.cpp:
+- Added alternative implementation for `check_valid` taht handles serial as input
+- Added `from_serial` function to return year, month and date from a serial
+
+</details>
+
+
+<details>
+<summary>6.2 Testing the Date Class</summary>
+
+TestDate.cpp
+- Added 2 test functions (`test_invalid_dates_by_y_m_d`  and `test_invalid_dates_by_serial`) to check invalid Date construction from year, month, date or serial
+- Added `test_date_to_serial_conversion` to check date to serial and back to date conversion 
+- Added `test_contiguous_serial` to check if contiguous dates in the valid time range only differ by 1 in terms of serial
+
+</details>
