@@ -5,10 +5,10 @@
 
 using namespace std;
 
-//void out_char_as_hex(int c)
+// void out_char_as_hex(int c)
 //{
-//    cout << hex << setw(2) << setfill('0') << c;
-//}
+//     cout << hex << setw(2) << setfill('0') << c;
+// }
 
 int main()
 {
@@ -32,6 +32,7 @@ int main()
     input_file.read_line();
     input_file >> y;
     cout << y << endl; // y should be reinterpreted as a double
-
+    // Remove the temp file after the test
+    remove("test.txt");
     return 0;
 }
